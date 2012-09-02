@@ -25,3 +25,8 @@ ev_handler.c: events.h events.c ev_handler.scm
 
 clean:
 	$(RM) -f $(OBJS) $(EXES) config_*.def*.c ev_handler.tmp.c ev_handler.c
+
+cscope:
+	find . -name "*\.[ch]" > cscope.files
+	find . -name "*\.def" >> cscope.files
+	cscope -b -q
