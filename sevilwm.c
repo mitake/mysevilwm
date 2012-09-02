@@ -154,6 +154,9 @@ int main(int argc, char *argv[]) {
             break;
         case DestroyNotify:
             handle_destroy_event(&ev.xdestroywindow); break;
+	case MotionNotify:
+		hook_motion_notify(&ev.xmotion);
+		break;
         }
 
         if (!XPending(dpy)) {

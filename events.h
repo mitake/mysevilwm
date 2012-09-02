@@ -68,4 +68,6 @@ void EVENT_FUNCTION ev_do_nothing(EvArgs args);
 
 #undef EVENT_FUNCTION
 
+void hook_motion_notify(XMotionEvent *ev);
+
 #endif // ! EVENT_H_

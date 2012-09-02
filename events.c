@@ -494,3 +494,37 @@ void ev_mouse_resize(EvArgs args) {
 
 void ev_do_nothing(EvArgs args) {
 }
+
+#include <assert.h>
+void hook_motion_notify(XMotionEvent *ev)
+{
+	int orig_x, orig_y;
+	Window w;
+	Client *c;
+
+	w = ev->window;
+	c = find_client(w);
+	if (current)
+		assert(c == current);
+	if (!c)
+		return;
+
+	orig_x = ev->x;
+	if (ev->x < c->x)
+		ev->x = c->x + 1;
+	else if (c->x + c->width < ev->x)
+		ev->x = c->x + c->width - 1;
+
+	orig_y = ev->y;
+	if (ev->y < c->y)
+		ev->y = c->y + 1;
+	else if (c->y + c->height < ev->y)
+		ev->y = c->y + c->height - 1;
+
+	ev->time = CurrentTime;
+	XSendEvent(dpy, w, True, NoEventMask, (XEvent *)ev);
+	XSync(dpy, False);
+
+	if (orig_x != ev->x || orig_y != ev->y)
+		XWarpPointer(dpy, None, w, 0, 0, 0, 0, ev->x, ev->y);
+}

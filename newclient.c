@@ -153,7 +153,7 @@ void init_position(Client *c) {
 void reparent(Client *c) {
     XSetWindowAttributes p_attr;
 
-    XSelectInput(dpy, c->window, EnterWindowMask | PropertyChangeMask);
+    XSelectInput(dpy, c->window, EnterWindowMask | PropertyChangeMask | PointerMotionMask);
 
     p_attr.override_redirect = True;
     p_attr.background_pixel = bg.pixel;
