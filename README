@@ -1,0 +1,204 @@
+sevilwm 0.9.9
+
+If you can't read Japanese, please read README.en
+
+シンプルなウィンドウマネージャである evilwm を改造したものです。
+カスタマイズ性が無かったり、欲しい機能があったり、
+バグがあったりしたのでいろいろいじりました。
+小さくて地味ですが、一通りの作業はできますし、
+特にキーボードでの操作は、相当色々なことができます。
+私はこれで作業をしています。
+
+詳しい紹介は
+http://shinh.skr.jp/sevilwm/
+をご覧下さい。
+
+インストールは
+make
+cp sevilwm /usr/local/bin
+です。
+
+デフォルトではクリックでフォーカスを移動するようになっていますが、
+それを変えたい場合は、 Makefile を編集して -DCLICK_FOCUS を
+外してやって下さい。
+
+* 設定
+
+設定はコンパイル前に config_*.def を編集することによって行います。
+
+- config_key.def
+
+だいたい見たらわかると思います。Ctrl+Alt が省略されています。
+Alt だけが良いという人は、 sevilwm.c の先頭の方にある、
+SEVILWM_MODIFIER_ALT マクロを定義してやって下さい。
+その場合は Alt のみが省略されている扱いになります。
+
+文法は、
+
+KEY(keycode, event, argument)
+
+となっていて、keycode は X のキーコードに、必要なら
+SHIFT や ALT や CTRL を | 記号で接続したものを書いて下さい。
+/usr/include/X11/keysymdef.h
+あたりを見ればキーコードは調べられます。
+マウスのボタンは、 XK_Pointer_Button? を使います。
+
+event は event.h で ev_* として定義されている関数を使用できます。
+
+argument は引数を使用する関数では指定できます。
+
+event で evilwm に対して付け加えたものは…
+
+・ev_exec_command arg
+arg で示したコマンドを実行します
+
+・ev_fix_next_vdesk, ev_fix_prev_vdesk
+現在フォーカスが合っているウィンドウを持ったまま
+次(前)の仮想デスクトップに移動します。
+
+・ev_left_focus, ev_down_focus, ev_up_focus, ev_right_focus
+  ev_upleft_focus, ev_downleft_focus, ev_upright_focus, ev_downright_focus
+一応このソフトのウリです。
+現在フォーカスが合っているウィンドウから見て
+指定した方向にあるウィンドウにフォーカスを移します。
+私の知る限りこの挙動ができる
+ウィンドウマネージャは他に存在しないのですが。
+
+・ev_wm_quit, ev_wm_restart
+WM を終了、再起動します。
+
+・ev_key_mark, ev_goto_mark
+これは頂いた機能です。
+冨永さん(tominaga _at_ cc.teu.ac.jp) に感謝します。
+vi like なマーク機能です。
+ev_key_mark の後に 'a'-'z' のキーを押すことによって
+ウィンドウにマークを設定します。
+その後、ev_goto_mark の後に 'a'-'z' のキーを押すことによって、
+マークしたウィンドウに戻ります。
+また、mark.h 内の MARKCHAR_PREVCLIENT に定義されている
+キーを押すことによって以前に ev_goto_mark する前のウィンドウに戻れます。
+これは今のところ設定ファイルで書き変えることができませんので、
+ソースを直接編集して下さい。
+
+・ev_raise_window
+ウィンドウを上に上げます。
+
+・ev_set_mode
+現在この機能は利用できません。
+違うモードに変更します。
+この別のモードは 0 以上の整数で指定して、
+それぞれに対して、keys, keys1, keys2... ファイルが対応します。
+これらのファイルは、例えば keys2 が無くて
+keys3 を定義するように、順番を飛ばしてはいけません。
+
+・ev_warp_pointer_x, ev_warp_pointer_y
+指定したピクセル分、マウスポインタを移動させます。
+
+・ev_resize_window_x, ev_resize_window_y
+指定したピクセル分、現在のウィンドウの大きさを変化させます。
+
+・ev_mouse_move, ev_mouse_resize
+マウスでドラッグしてウィンドウを移動変化させます。
+これはキーボードに対して割りつけることができないコマンドです。
+
+- config_win.def
+
+ウィンドウの初期位置を指定するファイルです。
+
+ WIN(name, index, x, y, w, h, vdesk, focused, mark)
+
+と指定します。詳しくは config_win.def のコメントを見て下さい。
+
+典型的には、一度インストールした sevilwm を起動し、
+適当に好みの window 配置にした後、付属の unixclient.rb を使って、
+
+ % ruby unixclient.rb /tmp/sevilwm_$DISPLAY/windows > config_win.def
+
+などとして現在の設定を取り出し、再コンパイルすると良いと思われます。
+
+- config_ign.def
+
+キーバインドでのスイッチを行う際に、無視する window の名前を指定します。
+例えば gkrellm を無視する場合、
+
+ ADDIGN("Gkrellm")
+
+などとして下さい。
+
+* 実行時での挙動設定
+
+sevilwm 実行中に、キーバインド、 window の位置、無視する window 、
+の設定をコマンドラインやプログラムから変更することができます。
+これらの変更は /tmp/sevilwm_$DISPLAY の下に置いてある
+Unix domain socket を通じて行います。
+
+/tmp/sevilwm_$DISPLAY/ctrl 以外は全て情報取得用のソケットで、
+ctrl は実行時に状態を変えるためのソケットです。
+ctrl には、 config_*.def がそのままコマンドとして
+読ませられるようになっています。
+
+このインターフェイスへのクライアントプログラムとしては
+sevil.rb というものが作りかけですが用意されています。
+sevil.rb を利用したサンプルプログラムとしては、
+testsprite.rb や shmups.rb というジョークプログラムが
+役に立つかもしれません。
+
+例えば、
+
+ % ruby sevil.rb ctrl < config_ign.def
+
+などとして変更した設定をすぐに試してみることができます。
+
+* その他
+
+だいたいは元のソフト通りの挙動となっています。
+README.evil も参照してください。
+
+こういう機能が欲しいとかあったら連絡を下さい。
+バグを見つけたら連絡下さい。
+
+コンパイルオプションはほとんどテストしていません。
+
+本当に最低限の英語の記述を README.en に書いて置きました。
+
+* TODO
+
+- sevil.rb をまともに
+- ドキュメント
+- デュアルディスプレイ？
+- コネクションのタイムアウト
+- クライアントがソケットのバッファサイズ以上のものを出力させておいてそれを受
+  け取らない…とかすると window manager が止まってしまう気がするので、 select
+  で write もチェックした方が良いと言えば良い
+
+* 適当 ChangeLog
+
+0.4.0 作った
+0.4.1 バグを少し
+0.5.0 機能を結構追加、バグフィックス。
+0.5.1 バグフィックス。
+0.5.2 バグフィックス。
+0.5.3 もういっちょ。
+0.5.4 いろいろ。
+0.6.0 突如 C になった。
+0.6.1 フォーカス回りの不具合を一掃したと思いたい。
+0.9.1 Unix domain socket で実行時設定を可能に
+      config_win.def, config_ign.def を追加
+      キーバインドが設定されていない Ctrl+Alt 入力は window に再送するように
+      (mitake さんに色々手伝っていただきました。感謝)
+0.9.2 メモリまわりのバグフィックス
+0.9.3 ignore がおかしかったのを修正
+0.9.4 click focus 時のリサイズの動作を修正 (by mitake さん)
+0.9.5 リスタート時にコマンドラインフラグを引き継ぐように (by mitake さん)
+0.9.6 コマンドライン引数の動的変更 (by mitake さん)
+0.9.7 リスタート時の window 位置を引き継ぐように (by mitake さん)
+0.9.8 リスタートまわりのバグ修正、 Firefox などのリロード時に
+      仮想デスクトップが違っても表示されてしまう問題を修正 (by mitake さん)
+0.9.9 フォーカス当たらない window があるバグを修正
+      SEVILWM_MODIFIER_ALT を導入
+      README で s/CONTROL/CTRL/ (by wachi さん)
+      ev_handler.c の生成方法変更 (by mitake さん)
+
+----------------------
+ shinichiro.h
+  shinichiro.hamaji _at_ gmail.com

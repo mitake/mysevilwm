@@ -1,0 +1,18 @@
+sevilwm 0.9.9
+
+I've modified a simple window manager, evilwm. I've added some
+functions and made it easier to customize. I think the most important
+change is adding ev_(left|down|up|right)_focus command. By default,
+they are assigned to Ctrl+Alt+[hjkl].
+
+You can customize the various settings by modifying config_key.def,
+config_win.def, and config_ign.def. These files will be compiled into
+the binary. So you must compile and install again when you modified
+them.
+
+You can change the settings even in run-time using unix domain
+sockets. Please check config_win.def or sevil.rb.
+
+----------------------
+ shinichiro.h
+  shinichiro.hamaji _at_ gmail.com

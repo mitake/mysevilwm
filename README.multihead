@@ -1,0 +1,30 @@
+There is currently no support in the binary for multiheaded systems.
+To run evilwm on such a system, you'll need to do a little extra work,
+and put up with some niggles.
+
+CODE
+
+In your .xinitrc, instead of a single line spawning evilwm, use
+something like:
+
+for x in 0 1 2; do
+	DISPLAY=:0.$x evilwm &
+	DISPLAY=:0.$x xterm -geometry +0+0 &
+done
+
+NIGGLES
+
+The reason I put an xterm in that for loop is that you need something
+to get focus from.  If you move the mouse from one screen to the next,
+focus will remain with whatever had it last until you move the mouse
+over a client window.  It doesn't have to be an xterm, you just have to
+make sure you have one client on each screen.
+
+For the same reason, if you've compiled the virtual desktop version
+(using -DVWM), it's a good idea to ensure that at least one client per
+screen is 'fixed' to stop yourself accidentally losing focus and having
+to manually start stuff (with eg DISPLAY=:0.x xeyes &) to regain it.
+
+Have fun,
+
+..ciaran
