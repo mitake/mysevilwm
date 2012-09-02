@@ -193,7 +193,7 @@ void setup_display() {
     XAllocNamedColor(dpy, DefaultColormap(dpy, screen), opt_fc, &fc, &dummy);
 
     font = XLoadQueryFont(dpy, opt_font);
-    if (!font) font = XLoadQueryFont(dpy, DEF_FONT);
+    if (!font) font = XLoadQueryFont(dpy, "*");
 
     move_curs = XCreateFontCursor(dpy, XC_fleur);
     resize_curs = XCreateFontCursor(dpy, XC_plus);
