@@ -5,3 +5,5 @@
 cscope.*
 
 sevilwm
+
+ev_handler.c
