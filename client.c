@@ -148,6 +148,8 @@ void send_wm_delete(Client *c) {
         if (found) send_xmessage(c->window, xa_wm_protos, xa_wm_delete);
         else XKillClient(dpy, c->window);
     }
+
+    next(NULL);
 }
 
 static int send_xmessage(Window w, Atom a, long x) {
