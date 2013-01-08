@@ -62,6 +62,8 @@ int orig_argc;
 char** orig_argv;
 extern int restarted;
 
+void force_set_focus(void);
+
 int main(int argc, char *argv[]) {
     struct sigaction act;
     int i;
@@ -159,6 +161,8 @@ int main(int argc, char *argv[]) {
         if (!XPending(dpy)) {
             ipc_process();
         }
+
+	force_set_focus();
     }
     return 1;
 }

@@ -493,3 +493,18 @@ void change_state(Client* client,
     }
     client->mark = mark;
 }
+
+void force_set_focus(void)
+{
+    Client *c;
+
+    if (current)
+	    return;
+
+    for (c = head_client; c; c = c->next) {
+	    if (c->vdesk == vdesk) {
+		    set_focus(c);
+		    return;
+	    }
+    }
+}
