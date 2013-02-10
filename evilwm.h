@@ -80,6 +80,8 @@ extern char throwUnmaps;
 
 extern int wm_running;
 
+extern Client **prev_focused;
+
 /* void do_event_loop(); */
 int handle_xerror(Display *dpy, XErrorEvent *e);
 int ignore_xerror(Display *dpy, XErrorEvent *e);

@@ -437,10 +437,14 @@ void switch_vdesk(int v) {
 
     vdesk = v;
 
-    if (max_inside) {
+    if (prev_focused[vdesk]) {
+        c = prev_focused[vdesk];
+        XRaiseWindow(dpy, c->parent);
+	set_focus(c);
+    } else if (max_inside) {
         c = max_inside;
         XRaiseWindow(dpy, c->parent);
-        set_focus(c);
+	set_focus(c);
 #ifdef CLICK_FOCUS
         driveEnterNotify = 0;
 #endif

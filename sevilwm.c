@@ -62,6 +62,8 @@ int orig_argc;
 char** orig_argv;
 extern int restarted;
 
+Client **prev_focused;
+
 void force_set_focus(void);
 
 int main(int argc, char *argv[]) {
@@ -96,6 +98,12 @@ int main(int argc, char *argv[]) {
 
             exit(2);
         }
+    }
+
+    prev_focused = calloc(opt_vd, sizeof(Client *));
+    if (!prev_focused) {
+	    fprintf(stderr, "error at allocating prev_focused\n");
+	    exit(1);
     }
 
     act.sa_handler = handle_signal;

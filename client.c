@@ -96,7 +96,11 @@ void remove_client(Client *c, int from_cleanup) {
     if (c->size) XFree(c->size);
 
     /* an enter event should set this up again */
-    if (c == current) current = NULL;
+    if (c == current) {
+	    current = NULL;
+	    if (prev_focused[c->vdesk] == c)
+		    prev_focused[c->vdesk] = NULL;
+    }
 
     free(c);
 #ifdef SANITY
