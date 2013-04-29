@@ -437,19 +437,21 @@ void switch_vdesk(int v) {
 
     vdesk = v;
 
-    if (prev_focused[vdesk]) {
-        c = prev_focused[vdesk];
-        XRaiseWindow(dpy, c->parent);
-	set_focus(c);
-    } else if (max_inside) {
-        c = max_inside;
-        XRaiseWindow(dpy, c->parent);
-	set_focus(c);
-#ifdef CLICK_FOCUS
-        driveEnterNotify = 0;
-#endif
-    }
+    if (prev_focused[vdesk])
+	    c = prev_focused[vdesk];
+    else if (max_inside)
+	    c = max_inside;
 
+    if (!c)
+	    return;
+
+    XRaiseWindow(dpy, c->parent);
+    set_focus(c);
+    warp_pointer(c->window, c->width + c->border - 1,
+	    c->height + c->border - 1);
+    XSetInputFocus(dpy, c->window, RevertToPointerRoot, CurrentTime);
+
+    driveEnterNotify = 0;
     throwUnmaps = 1;
 }
 

@@ -152,6 +152,7 @@ void set_focus(Client* c) {
     XSetWindowBackground(dpy, c->parent, (c->vdesk==-1)?fc.pixel:fg.pixel);
     XClearWindow(dpy, c->parent);
     current = c;
+
     if (0 < c->vdesk)
 	    prev_focused[c->vdesk] = c;
 }
