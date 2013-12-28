@@ -34,10 +34,6 @@
 #define GRAB(w, mask, curs) \
 	(XGrabPointer(dpy, w, False, mask, GrabModeAsync, GrabModeAsync, \
 	None, curs, CurrentTime) == GrabSuccess)
-#ifndef CLICK_FOCUS
-#define setmouse(w, x, y) \
-       XWarpPointer(dpy, None, w, 0, 0, 0, 0, x, y)
-#endif
 #define gravitate(c) \
 	change_gravity(c, 1)
 #define ungravitate(c) \
@@ -93,9 +89,7 @@ void handle_signal(int signo);
 void show_event(XEvent e);
 #endif
 
-#ifdef CLICK_FOCUS
 void warp_pointer(Window w, int x, int y);
-#endif
 
 # define RD_DESK( desk ) ( (desk)->vdesk )
 

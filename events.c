@@ -17,9 +17,7 @@
 
 Client* cl;
 
-#ifdef CLICK_FOCUS
 int driveEnterNotify = 1;
-#endif
 
 void handle_key_event(XKeyEvent *e) {
     cl = current;
@@ -38,11 +36,9 @@ void handle_key_event(XKeyEvent *e) {
 void handle_button_event(XEvent *ev) {
     XButtonEvent* e = &ev->xbutton;
 
-#ifdef CLICK_FOCUS
     /* ad-hoc addition for click and focus model */
     Client *target = find_client(e->window);
     if (target) set_focus(target);
-#endif
 
     cl = current;
 
@@ -86,9 +82,7 @@ void handle_configure_request(XConfigureRequestEvent *e) {
 void handle_map_request(XMapRequestEvent *e) {
     Client *c = find_client(e->window);
 
-#ifdef CLICK_FOCUS
     driveEnterNotify = 1;
-#endif
 
     if (c) {
         if (c->vdesk == vdesk) unhide(c, RAISE);
@@ -103,9 +97,7 @@ void handle_map_request(XMapRequestEvent *e) {
 void handle_unmap_event(XUnmapEvent* e) {
     Client* c = find_client(e->window);
 
-#ifdef CLICK_FOCUS
     driveEnterNotify = 1;
-#endif
 
     if (c) hide(c);
 }
@@ -158,29 +150,11 @@ void set_focus(Client* c) {
 void handle_enter_event(XCrossingEvent *e) {
     Client *c = find_client(e->window);
     if (c && current != c) {
-#if 0
-        /* IIRC, it was a fix for old skkinput. Since this works for
-         * other application poorly, comment out for now.
-         */
-        XWMHints *hints = XGetWMHints(dpy, c->window);
-        if (hints) {
-            if ( (hints->flags&InputHint) && (hints->input==False) ) {
-                XFree(hints);
-                return;
-            }
-            XFree(hints);
-        }
-#endif
-
         if (e->type == EnterNotify
-#ifdef CLICK_FOCUS
             && driveEnterNotify
-#endif
             ) {
             set_focus(c);
-#ifdef CLICK_FOCUS
             driveEnterNotify = 0;
-#endif
         }
     }
 }
@@ -194,14 +168,9 @@ void handle_focus_change_event(XFocusChangeEvent *e) {
 
 void do_move() {
     move(cl, 1);
-#ifdef CLICK_FOCUS
     warp_pointer(cl->window, cl->width + cl->border - 1,
                  cl->height + cl->border - 1);
     driveEnterNotify = 0;
-#else
-    setmouse(cl->window, cl->width + cl->border - 1,
-             cl->height + cl->border - 1);
-#endif
 }
 
 void ev_move_window_x(EvArgs args) {
@@ -220,14 +189,9 @@ void ev_move_window_y(EvArgs args) {
 
 void do_resize() {
     resize(cl, 1);
-#ifdef CLICK_FOCUS
     warp_pointer(cl->window, cl->width + cl->border - 1,
                  cl->height + cl->border - 1);
     driveEnterNotify = 0;
-#else
-    setmouse(cl->window, cl->width + cl->border - 1,
-             cl->height + cl->border - 1);
-#endif
 }
 
 void ev_resize_window_x(EvArgs args) {
@@ -301,14 +265,9 @@ void ev_maximise_window(EvArgs args) {
         maximise_horiz(cl);
         maximise_vert(cl);
         resize(cl, 1);
-#ifdef CLICK_FOCUS
         warp_pointer(cl->window, cl->width + cl->border - 1,
                      cl->height + cl->border - 1);
         driveEnterNotify = 0;
-#else
-        setmouse(cl->window, cl->width + cl->border - 1,
-                 cl->height + cl->border - 1);
-#endif
     }
 }
 
@@ -316,13 +275,8 @@ void ev_maximise_window_vert(EvArgs args) {
     if (cl != 0) {
         maximise_vert(cl);
         resize(cl, 1);
-#ifdef CLICK_FOCUS
         warp_pointer(cl->window, cl->width + cl->border - 1,
                      cl->height + cl->border - 1);
-#else
-        setmouse(cl->window, cl->width + cl->border - 1,
-                 cl->height + cl->border - 1);
-#endif
     }
 }
 
@@ -365,25 +319,19 @@ void ev_next_focus(EvArgs args) {
 }
 
 void ev_switch_vdesk(EvArgs args) {
-#ifdef CLICK_FOCUS
     driveEnterNotify = 0;
-#endif
     switch_vdesk(atoi(args));
 }
 
 void ev_next_vdesk(EvArgs args) {
-#ifdef CLICK_FOCUS
     driveEnterNotify = 0;
-#endif
     // XK_? is not good idea for vdesk number, I think.
     if (vdesk < opt_vd) switch_vdesk(vdesk + 1);
     else switch_vdesk(1);
 }
 
 void ev_prev_vdesk(EvArgs args) {
-#ifdef CLICK_FOCUS
     driveEnterNotify = 0;
-#endif
     if (vdesk > 1) switch_vdesk(vdesk - 1);
     else switch_vdesk(opt_vd);
 }
@@ -437,32 +385,18 @@ void ev_wm_quit(EvArgs args) {
 }
 
 void warp_pointer(
-#ifdef CLICK_FOCUS
     Window w,
-#endif
     int x, int y) {
-#ifdef CLICK_FOCUS
     driveEnterNotify = 1;
     XWarpPointer(dpy, None, w, 0, 0, 0, 0, x, y);
-#else
-    XWarpPointer(dpy, None, None, 0, 0, 0, 0, x, y);
-#endif
 }
 
 void ev_warp_pointer_x(EvArgs args) {
-#ifdef CLICK_FOCUS
     warp_pointer(None, atoi(args), 0);
-#else
-    warp_pointer(atoi(args), 0);
-#endif
 }
 
 void ev_warp_pointer_y(EvArgs args) {
-#ifdef CLICK_FOCUS
     warp_pointer(None, 0, atoi(args));
-#else
-    warp_pointer(0, atoi(args));
-#endif
 }
 
 void ev_raise_window(EvArgs args) {

@@ -9,9 +9,7 @@
 
 #include "evilwm.h"
 
-#ifdef CLICK_FOCUS
-extern int driveEnterNotify;
-#endif
+int driveEnterNotify;
 
 void draw_outline(Client *c) {
     char buf[50];
@@ -80,11 +78,7 @@ void sweep(Client *c) {
 
     draw_outline(c);
 
-#ifdef CLICK_FOCUS
     warp_pointer(c->window, c->width, c->height);
-#else
-    setmouse(c->window, c->width, c->height);
-#endif
     for (;;) {
         XMaskEvent(dpy, MouseMask, &ev);
         switch (ev.type) {
@@ -161,9 +155,7 @@ void resize(Client *c, int set) {
                           c->width, c->height);
         send_config(c);
         XRaiseWindow(dpy, c->parent);
-#ifdef CLICK_FOCUS
         driveEnterNotify = 0;
-#endif
     }
 }
 
@@ -229,13 +221,8 @@ void focus(Client* c) {
     if (c && (c->vdesk == vdesk || c->vdesk == -1)) {
         unhide(c, RAISE);
         // adhoc, enforcing focus out event
-#ifdef CLICK_FOCUS
         warp_pointer(c->window, c->width + c->border - 1,
                      c->height + c->border - 1);
-#else
-        setmouse(c->window, c->width + c->border - 1,
-                 c->height + c->border - 1);
-#endif
         XSetInputFocus(dpy, c->window, RevertToParent, CurrentTime);
     }
 }
