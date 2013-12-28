@@ -180,7 +180,6 @@ int main(int argc, char *argv[]) {
     init_restart_configs();
     scan_windows();
     keys_init();
-    ignore_init();
 
     throwAllUnmapEvent();
     throwUnmaps = 0;

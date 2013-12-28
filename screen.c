@@ -9,7 +9,6 @@
 
 #include "evilwm.h"
 #include "misc.h"
-#include "ignore.h"
 
 #ifdef CLICK_FOCUS
 extern int driveEnterNotify;
@@ -325,8 +324,7 @@ void arrow_next(Client* c, int x, int y) {
         newc = c = head_client;
         get_mouse_position(&srcX, &srcY);
 
-        if ((newc->vdesk == vdesk || newc->vdesk == -1) &&
-            !is_ignore(newc))
+        if ((newc->vdesk == vdesk || newc->vdesk == -1))
         {
             int diff = calc_clients_diff(srcX, srcY, newc, x, y);
             if (max == 0 || maxDiff < diff) {
@@ -348,8 +346,7 @@ void arrow_next(Client* c, int x, int y) {
             newc = head_client;
         }
 
-        if ((newc->vdesk == vdesk || newc->vdesk == -1) &&
-            !is_ignore(newc) && newc != c)
+        if ((newc->vdesk == vdesk || newc->vdesk == -1))
         {
             int diff = calc_clients_diff(srcX, srcY, newc, x, y);
             if (max == 0 || maxDiff < diff) {
@@ -380,8 +377,7 @@ void next(Client *c) {
             } else {
                 newc = head_client;
             }
-        } while (((newc->vdesk != vdesk && newc->vdesk != -1) ||
-                  is_ignore(newc)) && newc != c);
+        } while ((newc->vdesk != vdesk && newc->vdesk != -1) && newc != c);
     }
 
     focus(newc);

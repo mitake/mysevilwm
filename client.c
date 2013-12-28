@@ -4,7 +4,6 @@
 
 #include "evilwm.h"
 #include "client.h"
-#include "ignore.h"
 #include "screen.h"
 
 #include <stdlib.h>
