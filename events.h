@@ -51,7 +51,6 @@ void EVENT_FUNCTION ev_upright_focus(EvArgs args);
 void EVENT_FUNCTION ev_downleft_focus(EvArgs args);
 void EVENT_FUNCTION ev_downright_focus(EvArgs args);
 void EVENT_FUNCTION ev_wm_quit(EvArgs args);
-void EVENT_FUNCTION ev_wm_restart(EvArgs args);
 void EVENT_FUNCTION ev_mark_client(EvArgs args);
 void EVENT_FUNCTION ev_goto_mark(EvArgs args);
 void EVENT_FUNCTION ev_warp_pointer_x(EvArgs args);
