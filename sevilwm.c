@@ -7,7 +7,6 @@
 #include "events.h"
 #include "newclient.h"
 #include "misc.h"
-#include "ipc.h"
 #include "wins.h"
 #include "screen.h"
 
@@ -16,6 +15,8 @@
 #include <signal.h>
 #include <X11/cursorfont.h>
 #include <stdio.h>
+#include <X11/Xlib.h>
+#include <X11/Xproto.h>
 
 /* To change our modifiers ALT from CTRL+ALT, enable this macro.
 #define SEVILWM_MODIFIER_ALT
@@ -64,8 +65,65 @@ extern int restarted;
 
 Client **prev_focused;
 
+void handle_signal(int signo) {
+    if (signo == SIGCHLD) {
+        wait(NULL);
+        return;
+    }
+
+    quit_nicely();
+}
+void throwAllUnmapEvent() {
+    XEvent ev;
+    // throw all event
+    while (XCheckTypedEvent(dpy, UnmapNotify, &ev)) {}
+}
+
+int handle_xerror(Display *d, XErrorEvent *e) {
+    Client *c = find_client(e->resourceid);
+
+    /* if (e->error_code == BadAccess && e->resourceid == root) { */
+    if (e->error_code == BadAccess &&
+        e->request_code == X_ChangeWindowAttributes) {
+#ifdef STDIO
+        fprintf(stderr, "root window unavailable (maybe another wm is running?)\n");
+#endif
+        exit(1);
+    }
+    fprintf(stderr, "XError %x %d ", e->error_code, e->request_code);
+    if (c && e->error_code != BadWindow) {
+#ifdef XDEBUG
+        fprintf(stderr, "(removing client)\n");
+#endif
+        remove_client(c, NOT_QUITTING);
+    }
+    return 0;
+}
+
+int ignore_xerror(Display *d, XErrorEvent *e) {
+    return 0;
+}
+
+
 void force_set_focus(void);
 
+#define MAXPATHLEN 1024		/* tekito */
+
+void cleanup() {
+    char backup_file[MAXPATHLEN];
+
+    unlink(backup_file);
+
+    while(head_client) remove_client(head_client, QUITTING);
+    XSetInputFocus(dpy, PointerRoot, RevertToPointerRoot, CurrentTime);
+    XInstallColormap(dpy, DefaultColormap(dpy, screen));
+    XCloseDisplay(dpy);
+}
+
+void quit_nicely() {
+    cleanup();
+    exit(0);
+}
 int main(int argc, char *argv[]) {
     struct sigaction act;
     int i;
@@ -75,7 +133,6 @@ int main(int argc, char *argv[]) {
     orig_argv = argv;
 
     window_manager_name = argv[0];
-    backup_argv(argc, argv);
 
     for (i = 1; i < argc; i++) {
         if (!strcmp(argv[i], "-fn") && i+1<argc)
@@ -120,10 +177,8 @@ int main(int argc, char *argv[]) {
     signal(SIGPIPE, SIG_IGN);
 
     setup_display();
-    ipc_init_part();
     init_restart_configs();
     scan_windows();
-    ipc_init();
     keys_init();
     ignore_init();
 
@@ -164,10 +219,6 @@ int main(int argc, char *argv[]) {
             break;
         case DestroyNotify:
             handle_destroy_event(&ev.xdestroywindow); break;
-        }
-
-        if (!XPending(dpy)) {
-            ipc_process();
         }
 
 	force_set_focus();

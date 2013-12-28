@@ -21,71 +21,8 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 
-void throwAllUnmapEvent() {
-    XEvent ev;
-    // throw all event
-    while (XCheckTypedEvent(dpy, UnmapNotify, &ev)) {}
-}
 
-void spawn(char* cmd[]) {
-    pid_t pid;
 
-#if 0
-    int i;
-    for (i = 0; i < 100; i++) {
-        if (cmd[i] == NULL) break;
-        printf("%s ", cmd[i]);
-    }
-    printf("\n");
-#endif
-
-/* @@@
-   if (current_screen && current_screen->display)
-   putenv(current_screen->display);
-*/
-    pid = fork();
-
-    if (pid == 0) {
-        execvp(cmd[0], (char *const *)&cmd[0]);
-        printf("%s: error exec\n", cmd[0]);
-        exit(0);
-    }
-
-    /* @@@ it's not work. why? */
-#if 0
-    if (!(pid = fork())) {
-        setsid();
-        switch (fork()) {
-            /* explicitly hack around broken SUS execvp prototype */
-        case 0: execvp(cmd[0], (char *const *)&cmd[1]);
-        default: _exit(0);
-        }
-    }
-    if (pid > 0)
-        wait(NULL);
-#endif
-}
-
-void handle_signal(int signo) {
-    if (signo == SIGCHLD) {
-        wait(NULL);
-        return;
-    }
-
-    quit_nicely();
-}
-
-void cleanup() {
-    char backup_file[MAXPATHLEN];
-
-    mk_backfile_fullpath(backup_file);
-    unlink(backup_file);
-
-    while(head_client) remove_client(head_client, QUITTING);
-    XSetInputFocus(dpy, PointerRoot, RevertToPointerRoot, CurrentTime);
-    XInstallColormap(dpy, DefaultColormap(dpy, screen));
-    XCloseDisplay(dpy);
-}
 
 int restart_argv_len = 0;
 char * restart_argv = NULL;
@@ -202,35 +139,6 @@ void restart() {
     execl("/bin/sh", "sh", "-c", args, 0);
 }
 
-void quit_nicely() {
-    cleanup();
-    exit(0);
-}
-
-int handle_xerror(Display *d, XErrorEvent *e) {
-    Client *c = find_client(e->resourceid);
-
-    /* if (e->error_code == BadAccess && e->resourceid == root) { */
-    if (e->error_code == BadAccess &&
-        e->request_code == X_ChangeWindowAttributes) {
-#ifdef STDIO
-        fprintf(stderr, "root window unavailable (maybe another wm is running?)\n");
-#endif
-        exit(1);
-    }
-    fprintf(stderr, "XError %x %d ", e->error_code, e->request_code);
-    if (c && e->error_code != BadWindow) {
-#ifdef XDEBUG
-        fprintf(stderr, "(removing client)\n");
-#endif
-        remove_client(c, NOT_QUITTING);
-    }
-    return 0;
-}
-
-int ignore_xerror(Display *d, XErrorEvent *e) {
-    return 0;
-}
 
 #ifdef DEBUG
 void dump_clients() {

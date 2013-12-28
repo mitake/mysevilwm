@@ -1,7 +1,7 @@
 #CFLAGS = -g -DSTDIO -DCLICK_FOCUS -DDEBUG
 CFLAGS = -Os -DSTDIO -DCLICK_FOCUS
 LDFLAGS = -L/usr/X11R6/lib -lX11
-OBJS = newclient.o screen.o keys.o mark.o misc.o events.o sevilwm.o ignore.o client.o ipc.o str.o ctrl.o parser.o wins.o ev_handler.o config_key.o config_win.o config_ign.o
+OBJS = newclient.o screen.o keys.o mark.o events.o sevilwm.o ignore.o client.o str.o parser.o wins.o ev_handler.o config_key.o config_win.o config_ign.o
 EXES = sevilwm
 
 all: $(EXES)

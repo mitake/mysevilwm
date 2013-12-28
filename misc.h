@@ -9,7 +9,6 @@ void get_argv(int argc, char ** args, ctrl_message_callback message_cb);
 void clear_argv(int argc, char ** args, ctrl_message_callback message_cb);
 
 void throwAllUnmapEvent();
-void quit_nicely();
 void restart();
 #ifdef SANITY
 void sanity_check();

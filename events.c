@@ -339,6 +339,45 @@ void ev_fix_window(EvArgs args) {
     }
 }
 
+void spawn(char* cmd[]) {
+    pid_t pid;
+
+#if 0
+    int i;
+    for (i = 0; i < 100; i++) {
+        if (cmd[i] == NULL) break;
+        printf("%s ", cmd[i]);
+    }
+    printf("\n");
+#endif
+
+/* @@@
+   if (current_screen && current_screen->display)
+   putenv(current_screen->display);
+*/
+    pid = fork();
+
+    if (pid == 0) {
+        execvp(cmd[0], (char *const *)&cmd[0]);
+        printf("%s: error exec\n", cmd[0]);
+        exit(0);
+    }
+
+    /* @@@ it's not work. why? */
+#if 0
+    if (!(pid = fork())) {
+        setsid();
+        switch (fork()) {
+            /* explicitly hack around broken SUS execvp prototype */
+        case 0: execvp(cmd[0], (char *const *)&cmd[1]);
+        default: _exit(0);
+        }
+    }
+    if (pid > 0)
+        wait(NULL);
+#endif
+}
+
 void ev_exec_command(EvArgs args) {
     char* a[64];
     char* tmp = (char*)malloc(strlen(args)+1);
@@ -424,10 +463,6 @@ void ev_downright_focus(EvArgs args) {
 
 void ev_wm_quit(EvArgs args) {
     quit_nicely();
-}
-
-void ev_wm_restart(EvArgs args) {
-    restart();
 }
 
 void warp_pointer(

@@ -76,23 +76,11 @@ void add_restart_configs(char * line) {
     }
 }
 
-void mk_backfile_fullpath(char * path) {
-    /* caution, path must be allocated (MAXPATHLEN) */
-    extern char * ipc_dir;
-
-    bzero(path, MAXPATHLEN);
-    strcpy(path, ipc_dir);
-    path[strlen(path)] = '/';
-    strcpy(path + strlen(path), WIN_BACK);
-}
-
 void init_restart_configs() {
     int fd, i = 0, rsize;
     char backup_name[MAXPATHLEN];
     char * line;
     char rbyte;
-
-    mk_backfile_fullpath(backup_name);
 
     fd = open(backup_name, O_RDONLY);
     if(fd < 0) {
