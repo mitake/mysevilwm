@@ -7,7 +7,6 @@
 #include "client.h"
 #include "screen.h"
 #include "newclient.h"
-#include "mark.h"
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -491,14 +490,6 @@ void ev_warp_pointer_y(EvArgs args) {
 #else
     warp_pointer(0, atoi(args));
 #endif
-}
-
-void ev_mark_client(EvArgs args) {
-    if (cl) mark_client(cl);
-}
-
-void ev_goto_mark(EvArgs args) {
-    goto_mark(cl);
 }
 
 void ev_set_mode(EvArgs args) {
