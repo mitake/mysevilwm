@@ -16,14 +16,7 @@
 #include <X11/Xlib.h>
 #include <X11/Xproto.h>
 
-/* To change our modifiers ALT from CTRL+ALT, enable this macro.
-#define SEVILWM_MODIFIER_ALT
-*/
-#ifdef SEVILWM_MODIFIER_ALT
-const unsigned int sevilwm_key_event_modifiers = Mod1Mask;
-#else
 const unsigned int sevilwm_key_event_modifiers = ControlMask | Mod1Mask;
-#endif
 
 Display     *dpy;
 Client      *current = NULL;
@@ -48,17 +41,9 @@ int     opt_bw = DEF_BW;
 XColor      fg, bg, fc;
 char        *opt_fc = DEF_FC;
 int     vdesk = 1;
-#ifdef SANITY
-int     tracked_count = 0;
-#endif
 int wm_running;
 
-char*           window_manager_name;
-
 char throwUnmaps;
-
-int orig_argc;
-char** orig_argv;
 
 Client **prev_focused;
 
@@ -104,13 +89,7 @@ int ignore_xerror(Display *d, XErrorEvent *e) {
 
 void force_set_focus(void);
 
-#define MAXPATHLEN 1024		/* tekito */
-
 void cleanup() {
-    char backup_file[MAXPATHLEN];
-
-    unlink(backup_file);
-
     while(head_client) remove_client(head_client, QUITTING);
     XSetInputFocus(dpy, PointerRoot, RevertToPointerRoot, CurrentTime);
     XInstallColormap(dpy, DefaultColormap(dpy, screen));
@@ -125,11 +104,6 @@ int main(int argc, char *argv[]) {
     struct sigaction act;
     int i;
     XEvent ev;
-
-    orig_argc = argc;
-    orig_argv = argv;
-
-    window_manager_name = argv[0];
 
     for (i = 1; i < argc; i++) {
         if (!strcmp(argv[i], "-fn") && i+1<argc)
@@ -183,9 +157,6 @@ int main(int argc, char *argv[]) {
     wm_running = 1;
     /* main event loop here */
     while (wm_running) {
-#ifdef SANITY
-        sanity_check();
-#endif
         XNextEvent(dpy, &ev);
         switch (ev.type) {
         case KeyPress:
@@ -229,7 +200,7 @@ void setup_display() {
     fprintf(stderr, "main:XOpenDisplay(); ");
 #endif
     dpy = XOpenDisplay(opt_display);
-    if (!dpy) { 
+    if (!dpy) {
 #ifdef STDIO
         fprintf(stderr, "can't open display %s\n", opt_display);
 #endif
