@@ -7,7 +7,6 @@
 #include "events.h"
 #include "newclient.h"
 #include "misc.h"
-#include "wins.h"
 #include "screen.h"
 
 #include <stdlib.h>
@@ -61,7 +60,6 @@ char throwUnmaps;
 
 int orig_argc;
 char** orig_argv;
-extern int restarted;
 
 Client **prev_focused;
 
@@ -177,14 +175,12 @@ int main(int argc, char *argv[]) {
     signal(SIGPIPE, SIG_IGN);
 
     setup_display();
-    init_restart_configs();
     scan_windows();
     keys_init();
 
     throwAllUnmapEvent();
     throwUnmaps = 0;
 
-    restarted = 0;
     wm_running = 1;
     /* main event loop here */
     while (wm_running) {
@@ -285,8 +281,6 @@ void scan_windows() {
     unsigned int i, nwins;
     Window dw1, dw2, *wins;
     XWindowAttributes attr;
-    extern int restart_focused_vdesk;
-    extern Client * restart_focused_client;
 
 #ifdef XDEBUG
     fprintf(stderr, "main:XQueryTree(); ");
@@ -301,9 +295,4 @@ void scan_windows() {
             make_new_client(wins[i]);
     }
     XFree(wins);
-
-    if(restarted) {
-	switch_vdesk(restart_focused_vdesk);
-	focus(restart_focused_client);
-    }
 }

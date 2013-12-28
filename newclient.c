@@ -5,7 +5,6 @@
 #include "evilwm.h"
 #include "newclient.h"
 #include "screen.h"
-#include "wins.h"
 
 #include <stdlib.h>
 #include <string.h>
@@ -119,8 +118,6 @@ again:
             goto again;
         }
     }
-
-    apply_window_config(c);
 }
 
 void init_position(Client *c) {
