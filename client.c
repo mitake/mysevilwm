@@ -102,18 +102,6 @@ void remove_client(Client *c, int from_cleanup) {
     }
 
     free(c);
-#ifdef SANITY
-    tracked_count--;
-#endif
-#ifdef DEBUG
-    {
-        Client *p;
-        int i = 0;
-        for (p = head_client; p; p = p->next)
-            i++;
-        fprintf(stderr, "CLIENT: free(), window count now %d\n", i);
-    }
-#endif
 
     XSync(dpy, False);
     XSetErrorHandler(handle_xerror);
@@ -167,20 +155,3 @@ static int send_xmessage(Window w, Atom a, long x) {
 
     return XSendEvent(dpy, w, False, NoEventMask, &ev);
 }
-/*
-  void client_to_front(Client *c) {
-  Client *p;
-
-  if (head_client == c) {
-  head_client = c->next;
-  }
-  for (p = head_client; p->next; p = p->next) {
-  if (p->next == c) {
-  p->next = c->next;
-  }
-  }
-  p->next = c;
-  c->next = NULL;
-  }
-*/
-

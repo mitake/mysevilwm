@@ -199,42 +199,6 @@ void maximise_vert(Client *c) {
     }
 }
 
-// it is no use...
-#if 0
-void iconize(Client* c) {
-    if (!c) return;
-
-    if (c->oldw) {
-        c->x = c->oldx;
-        c->width = c->oldw;
-        c->oldw = 0;
-        c->y = c->oldy;
-        c->height = c->oldh;
-        c->oldh = 0;
-    } else {
-        c->oldx = c->x;
-        c->oldw = c->width;
-        c->oldy = c->y;
-        c->oldh = c->height;
-        int newx = XTextWidth(font, c->name, strlen(c->name)) + SPACE * 2;
-        recalculate_sweep(c, c->x, c->y, c->x+newx, c->y+20);
-    }
-
-    XDrawString(dpy, c->window, invert_gc,
-                SPACE, SPACE,
-                c->name, strlen(c->name));
-
-    resize(c, 1);
-#ifdef CLICK_FOCUS
-    warp_pointer(c->window, c->width + c->border - 1,
-                 c->height + c->border - 1);
-#else
-    setmouse(c->window, c->width + c->border - 1,
-             c->height + c->border - 1);
-#endif
-}
-#endif
-
 void hide(Client *c) {
     if (c) {
 #ifdef XDEBUG
