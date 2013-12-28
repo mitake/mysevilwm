@@ -3,7 +3,6 @@
  * see README for license and other details. */
 
 #include "evilwm.h"
-#include "sevilwm.h"
 #include "events.h"
 #include "newclient.h"
 #include "screen.h"
@@ -47,6 +46,18 @@ char throwUnmaps;
 
 Client **prev_focused;
 
+void cleanup() {
+    while(head_client) remove_client(head_client, QUITTING);
+    XSetInputFocus(dpy, PointerRoot, RevertToPointerRoot, CurrentTime);
+    XInstallColormap(dpy, DefaultColormap(dpy, screen));
+    XCloseDisplay(dpy);
+}
+
+void quit_nicely() {
+    cleanup();
+    exit(0);
+}
+
 void handle_signal(int signo) {
     if (signo == SIGCHLD) {
         wait(NULL);
@@ -89,17 +100,82 @@ int ignore_xerror(Display *d, XErrorEvent *e) {
 
 void force_set_focus(void);
 
-void cleanup() {
-    while(head_client) remove_client(head_client, QUITTING);
-    XSetInputFocus(dpy, PointerRoot, RevertToPointerRoot, CurrentTime);
-    XInstallColormap(dpy, DefaultColormap(dpy, screen));
-    XCloseDisplay(dpy);
+void setup_display() {
+    XGCValues gv;
+    XSetWindowAttributes attr;
+    XColor dummy;
+
+#ifdef XDEBUG
+    fprintf(stderr, "main:XOpenDisplay(); ");
+#endif
+    dpy = XOpenDisplay(opt_display);
+    if (!dpy) {
+#ifdef STDIO
+        fprintf(stderr, "can't open display %s\n", opt_display);
+#endif
+        exit(1);
+    }
+    XSetErrorHandler(handle_xerror);
+
+    screen = DefaultScreen(dpy);
+    root = RootWindow(dpy, screen);
+
+    xa_wm_state = XInternAtom(dpy, "WM_STATE", False);
+    xa_wm_change_state = XInternAtom(dpy, "WM_CHANGE_STATE", False);
+    xa_wm_protos = XInternAtom(dpy, "WM_PROTOCOLS", False);
+    xa_wm_delete = XInternAtom(dpy, "WM_DELETE_WINDOW", False);
+
+    XAllocNamedColor(dpy, DefaultColormap(dpy, screen), opt_fg, &fg, &dummy);
+    XAllocNamedColor(dpy, DefaultColormap(dpy, screen), opt_bg, &bg, &dummy);
+    XAllocNamedColor(dpy, DefaultColormap(dpy, screen), opt_fc, &fc, &dummy);
+
+    font = XLoadQueryFont(dpy, opt_font);
+    if (!font) font = XLoadQueryFont(dpy, "*");
+
+    move_curs = XCreateFontCursor(dpy, XC_fleur);
+    resize_curs = XCreateFontCursor(dpy, XC_plus);
+
+    gv.function = GXinvert;
+    gv.subwindow_mode = IncludeInferiors;
+    gv.line_width = 1;  /* opt_bw */
+    gv.font = font->fid;
+    invert_gc = XCreateGC(dpy, root, GCFunction | GCSubwindowMode | GCLineWidth | GCFont, &gv);
+
+    attr.event_mask = ChildMask | PropertyChangeMask
+        | ButtonMask
+        ;
+    XChangeWindowAttributes(dpy, root, CWEventMask, &attr);
+    /* Unfortunately grabbing AnyKey under Solaris seems not to work */
+    /* XGrabKey(dpy, AnyKey, ControlMask|Mod1Mask, root, True, GrabModeAsync, GrabModeAsync); */
+    /* So now I grab each and every one. */
+    XGrabKey(dpy, AnyKey, sevilwm_key_event_modifiers,
+             root, True, GrabModeAsync, GrabModeAsync);
+    XGrabKey(dpy, AnyKey, sevilwm_key_event_modifiers | ShiftMask,
+             root, True, GrabModeAsync, GrabModeAsync);
+
+    XGrabKey(dpy, XKeysymToKeycode(dpy, XK_Tab), Mod1Mask, root, True, GrabModeAsync, GrabModeAsync);
 }
 
-void quit_nicely() {
-    cleanup();
-    exit(0);
+void scan_windows() {
+    unsigned int i, nwins;
+    Window dw1, dw2, *wins;
+    XWindowAttributes attr;
+
+#ifdef XDEBUG
+    fprintf(stderr, "main:XQueryTree(); ");
+#endif
+    XQueryTree(dpy, root, &dw1, &dw2, &wins, &nwins);
+#ifdef XDEBUG
+    fprintf(stderr, "%d windows\n", nwins);
+#endif
+    for (i = 0; i < nwins; i++) {
+        XGetWindowAttributes(dpy, wins[i], &attr);
+        if (!attr.override_redirect && attr.map_state == IsViewable)
+            make_new_client(wins[i]);
+    }
+    XFree(wins);
 }
+
 int main(int argc, char *argv[]) {
     struct sigaction act;
     int i;
@@ -191,78 +267,3 @@ int main(int argc, char *argv[]) {
     return 1;
 }
 
-void setup_display() {
-    XGCValues gv;
-    XSetWindowAttributes attr;
-    XColor dummy;
-
-#ifdef XDEBUG
-    fprintf(stderr, "main:XOpenDisplay(); ");
-#endif
-    dpy = XOpenDisplay(opt_display);
-    if (!dpy) {
-#ifdef STDIO
-        fprintf(stderr, "can't open display %s\n", opt_display);
-#endif
-        exit(1);
-    }
-    XSetErrorHandler(handle_xerror);
-
-    screen = DefaultScreen(dpy);
-    root = RootWindow(dpy, screen);
-
-    xa_wm_state = XInternAtom(dpy, "WM_STATE", False);
-    xa_wm_change_state = XInternAtom(dpy, "WM_CHANGE_STATE", False);
-    xa_wm_protos = XInternAtom(dpy, "WM_PROTOCOLS", False);
-    xa_wm_delete = XInternAtom(dpy, "WM_DELETE_WINDOW", False);
-
-    XAllocNamedColor(dpy, DefaultColormap(dpy, screen), opt_fg, &fg, &dummy);
-    XAllocNamedColor(dpy, DefaultColormap(dpy, screen), opt_bg, &bg, &dummy);
-    XAllocNamedColor(dpy, DefaultColormap(dpy, screen), opt_fc, &fc, &dummy);
-
-    font = XLoadQueryFont(dpy, opt_font);
-    if (!font) font = XLoadQueryFont(dpy, "*");
-
-    move_curs = XCreateFontCursor(dpy, XC_fleur);
-    resize_curs = XCreateFontCursor(dpy, XC_plus);
-
-    gv.function = GXinvert;
-    gv.subwindow_mode = IncludeInferiors;
-    gv.line_width = 1;  /* opt_bw */
-    gv.font = font->fid;
-    invert_gc = XCreateGC(dpy, root, GCFunction | GCSubwindowMode | GCLineWidth | GCFont, &gv);
-
-    attr.event_mask = ChildMask | PropertyChangeMask
-        | ButtonMask
-        ;
-    XChangeWindowAttributes(dpy, root, CWEventMask, &attr);
-    /* Unfortunately grabbing AnyKey under Solaris seems not to work */
-    /* XGrabKey(dpy, AnyKey, ControlMask|Mod1Mask, root, True, GrabModeAsync, GrabModeAsync); */
-    /* So now I grab each and every one. */
-    XGrabKey(dpy, AnyKey, sevilwm_key_event_modifiers,
-             root, True, GrabModeAsync, GrabModeAsync);
-    XGrabKey(dpy, AnyKey, sevilwm_key_event_modifiers | ShiftMask,
-             root, True, GrabModeAsync, GrabModeAsync);
-
-    XGrabKey(dpy, XKeysymToKeycode(dpy, XK_Tab), Mod1Mask, root, True, GrabModeAsync, GrabModeAsync);
-}
-
-void scan_windows() {
-    unsigned int i, nwins;
-    Window dw1, dw2, *wins;
-    XWindowAttributes attr;
-
-#ifdef XDEBUG
-    fprintf(stderr, "main:XQueryTree(); ");
-#endif
-    XQueryTree(dpy, root, &dw1, &dw2, &wins, &nwins);
-#ifdef XDEBUG
-    fprintf(stderr, "%d windows\n", nwins);
-#endif
-    for (i = 0; i < nwins; i++) {
-        XGetWindowAttributes(dpy, wins[i], &attr);
-        if (!attr.override_redirect && attr.map_state == IsViewable)
-            make_new_client(wins[i]);
-    }
-    XFree(wins);
-}
