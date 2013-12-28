@@ -6,7 +6,6 @@
 #include "sevilwm.h"
 #include "events.h"
 #include "newclient.h"
-#include "misc.h"
 #include "screen.h"
 
 #include <stdlib.h>

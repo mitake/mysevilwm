@@ -6,7 +6,6 @@
 #include "events.h"
 #include "client.h"
 #include "screen.h"
-#include "misc.h"
 #include "newclient.h"
 #include "mark.h"
 

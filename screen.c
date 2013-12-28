@@ -8,7 +8,6 @@
 #include <limits.h>
 
 #include "evilwm.h"
-#include "misc.h"
 
 #ifdef CLICK_FOCUS
 extern int driveEnterNotify;
