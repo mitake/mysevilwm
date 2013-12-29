@@ -78,16 +78,10 @@ int handle_xerror(Display *d, XErrorEvent *e) {
     /* if (e->error_code == BadAccess && e->resourceid == root) { */
     if (e->error_code == BadAccess &&
         e->request_code == X_ChangeWindowAttributes) {
-#ifdef STDIO
-        fprintf(stderr, "root window unavailable (maybe another wm is running?)\n");
-#endif
         exit(1);
     }
     fprintf(stderr, "XError %x %d ", e->error_code, e->request_code);
     if (c && e->error_code != BadWindow) {
-#ifdef XDEBUG
-        fprintf(stderr, "(removing client)\n");
-#endif
         remove_client(c, NOT_QUITTING);
     }
     return 0;
@@ -105,14 +99,8 @@ void setup_display() {
     XSetWindowAttributes attr;
     XColor dummy;
 
-#ifdef XDEBUG
-    fprintf(stderr, "main:XOpenDisplay(); ");
-#endif
     dpy = XOpenDisplay(opt_display);
     if (!dpy) {
-#ifdef STDIO
-        fprintf(stderr, "can't open display %s\n", opt_display);
-#endif
         exit(1);
     }
     XSetErrorHandler(handle_xerror);
@@ -161,13 +149,7 @@ void scan_windows() {
     Window dw1, dw2, *wins;
     XWindowAttributes attr;
 
-#ifdef XDEBUG
-    fprintf(stderr, "main:XQueryTree(); ");
-#endif
     XQueryTree(dpy, root, &dw1, &dw2, &wins, &nwins);
-#ifdef XDEBUG
-    fprintf(stderr, "%d windows\n", nwins);
-#endif
     for (i = 0; i < nwins; i++) {
         XGetWindowAttributes(dpy, wins[i], &attr);
         if (!attr.override_redirect && attr.map_state == IsViewable)

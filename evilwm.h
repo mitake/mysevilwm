@@ -64,9 +64,6 @@ extern int		opt_bw;
 extern XColor		fg, bg, fc;
 extern char		*opt_fc;
 extern int		vdesk;
-#ifdef SANITY
-extern int		tracked_count;
-#endif
 
 extern char*		window_manager_name;
 
@@ -85,20 +82,13 @@ void dump_clients();
 /*void spawn(const char *const cmd[]);*/
 void spawn(char* cmd[]);
 void handle_signal(int signo);
-#ifdef DEBUG
-void show_event(XEvent e);
-#endif
 
 void warp_pointer(Window w, int x, int y);
 
 # define RD_DESK( desk ) ( (desk)->vdesk )
 
-#ifdef DEBUG
 #define LOG(msg, ...) do {                      \
         fprintf(stderr, msg,  ## __VA_ARGS__);  \
     } while (0)
-#else
-#define LOG(msg, ...) do {} while (0)
-#endif
 
 #endif // ! EVILWM_H_

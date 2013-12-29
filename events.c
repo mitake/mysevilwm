@@ -87,9 +87,6 @@ void handle_map_request(XMapRequestEvent *e) {
     if (c) {
         if (c->vdesk == vdesk) unhide(c, RAISE);
     } else {
-#ifdef DEBUG
-        fprintf(stderr, "event:map->make_new_client(); ");
-#endif
         make_new_client(e->window);
     }
 }

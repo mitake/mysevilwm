@@ -21,9 +21,6 @@ void make_new_client(Window w) {
 
     XGrabServer(dpy);
     XSetErrorHandler(ignore_xerror);
-#ifdef XDEBUG
-    fprintf(stderr, "XGetWMHints(); ");
-#endif
     hints = XGetWMHints(dpy, w);
 
     shints = XAllocSizeHints();
@@ -31,20 +28,8 @@ void make_new_client(Window w) {
 
     c = (Client *)malloc(sizeof(Client));
     memset(c, 0, sizeof(*c));
-#ifdef SANITY
-    tracked_count++;
-#endif
     c->next = head_client;
     head_client = c;
-#ifdef DEBUG
-    {
-        Client *p;
-        int i = 0;
-        for (p = head_client; p; p = p->next)
-            i++;
-        fprintf(stderr, "NEW: malloc(), window count now %d\n", i);
-    }
-#endif
 
     /* initialise(c, w); */
     c->window = w;
@@ -52,9 +37,6 @@ void make_new_client(Window w) {
 
     /* try these here instead */
     c->size = shints;
-#ifdef XDEBUG
-    fprintf(stderr, "XGetWMNormalHints(); ");
-#endif
 
     XClassHint* hint = XAllocClassHint();
     XGetClassHint(dpy, w, hint);
@@ -75,9 +57,6 @@ void make_new_client(Window w) {
     c->vdesk = vdesk;
     c->index = 0;
 
-    // c->size = XAllocSizeHints();
-    // XGetWMNormalHints(dpy, c->window, c->size, &dummy);
-
     if (!(attr.map_state == IsViewable)) {
         init_position(c);
         if (hints && hints->flags & StateHint)
@@ -90,12 +69,6 @@ void make_new_client(Window w) {
 
     gravitate(c);
     reparent(c);
-
-#ifdef DEBUG
-    if (wm_state(c) == IconicState) {
-        fprintf(stderr, "NEW: client thinks it's iconised\n");
-    }
-#endif
 
     XGrabButton(dpy, AnyButton, Mod1Mask, c->parent, False,
                 ButtonMask, GrabModeSync, GrabModeAsync, None, None);

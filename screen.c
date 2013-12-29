@@ -160,9 +160,6 @@ void resize(Client *c, int set) {
 }
 
 void maximise_horiz(Client *c) {
-#ifdef DEBUG
-    fprintf(stderr, "SCREEN: maximise_horiz()\n");
-#endif
     if (c->oldw) {
         c->x = c->oldx;
         c->width = c->oldw;
@@ -176,9 +173,6 @@ void maximise_horiz(Client *c) {
 }
 
 void maximise_vert(Client *c) {
-#ifdef DEBUG
-    fprintf(stderr, "SCREEN: maximise_vert()\n");
-#endif
     if (c->oldh) {
         c->y = c->oldy;
         c->height = c->oldh;
@@ -193,26 +187,14 @@ void maximise_vert(Client *c) {
 
 void hide(Client *c) {
     if (c) {
-#ifdef XDEBUG
-        fprintf(stderr, "screen:XUnmapWindow(parent); ");
-#endif
         XUnmapWindow(dpy, c->parent);
-#ifdef XDEBUG
-        fprintf(stderr, "screen:XUnmapWindow(window); ");
-#endif
         XUnmapWindow(dpy, c->window);
         set_wm_state(c, IconicState);
     }
 }
 
 void unhide(Client *c, int raise) {
-#ifdef XDEBUG
-    fprintf(stderr, "screen:XMapWindow(window); ");
-#endif
     XMapWindow(dpy, c->window);
-#ifdef XDEBUG
-    fprintf(stderr, "screen:XMapRaised(parent); ");
-#endif
     raise ? XMapRaised(dpy, c->parent) : XMapWindow(dpy, c->parent);
     set_wm_state(c, NormalState);
 }
@@ -352,9 +334,6 @@ void switch_vdesk(int v) {
 
     if (v == vdesk)
         return;
-#ifdef DEBUG
-    fprintf(stderr, "\nscreen:switch_vdesk(%d); ", v);
-#endif
 
     if (current != 0) {
         XSetWindowBackground(dpy, current->parent, bg.pixel);

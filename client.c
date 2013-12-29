@@ -28,9 +28,6 @@ void set_wm_state(Client *c, int state) {
     data[0] = (long) state;
     data[1] = None; /* icon window */
 
-#ifdef DEBUG
-    fprintf(stderr, "set_wm_state();\n");
-#endif
     XChangeProperty(dpy, c->window, xa_wm_state, xa_wm_state,
                     32, PropModeReplace, (unsigned char *)data, 2);
 }
