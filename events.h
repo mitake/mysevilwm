@@ -58,6 +58,8 @@ void ev_resize_window_x(EvArgs args);
 void ev_resize_window_y(EvArgs args);
 void ev_do_nothing(EvArgs args);
 
+void warp_pointer(Window w, int x, int y);
+
 #include "client.h"
 void set_focus(Client* c);
 

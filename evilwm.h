@@ -8,7 +8,6 @@
 #include "client.h"
 
 /* default settings */
-
 #define DEF_FONT	"lucidasans-10"
 #define DEF_FG		"goldenrod"
 #define DEF_BG		"grey50"
@@ -19,73 +18,50 @@
 #define DEF_VD		4
 
 /* readability stuff */
-
 #define NOT_QUITTING	0
 #define QUITTING	1	/* for remove_client */
 #define RAISE		1
 #define NO_RAISE	0	/* for unhide() */
 
 /* some coding shorthand */
+#define ChildMask	(SubstructureRedirectMask | SubstructureNotifyMask)
+#define ButtonMask	(ButtonPressMask | ButtonReleaseMask)
+#define MouseMask	(ButtonMask | PointerMotionMask)
 
-#define ChildMask	(SubstructureRedirectMask|SubstructureNotifyMask)
-#define ButtonMask	(ButtonPressMask|ButtonReleaseMask)
-#define MouseMask	(ButtonMask|PointerMotionMask)
-
-#define GRAB(w, mask, curs) \
-	(XGrabPointer(dpy, w, False, mask, GrabModeAsync, GrabModeAsync, \
-	None, curs, CurrentTime) == GrabSuccess)
 #define gravitate(c) \
 	change_gravity(c, 1)
+
 #define ungravitate(c) \
 	change_gravity(c, -1)
 
-/* declarations for global variables in main.c */
+extern Display *dp;
+extern Client *current;
+extern int screen;
+extern Window root;
+extern GC invert_gc;
+extern XFontStruct *font;
+extern Client *head_client;
+extern Atom xa_wm_state;
+extern Atom xa_wm_change_state;
+extern Atom xa_wm_protos;
+extern Atom xa_wm_delete;
+extern Cursor move_curs;
+extern Cursor resize_curs;
+extern int opt_vd;
+extern int opt_bw;
+extern XColor fg, bg, fc;
 
-extern Display		*dpy;
-extern Client		*current;
-extern int		screen;
-extern Window		root;
-extern GC		invert_gc;
-extern XFontStruct	*font;
-extern Client		*head_client;
-extern Atom		xa_wm_state;
-extern Atom		xa_wm_change_state;
-extern Atom		xa_wm_protos;
-extern Atom		xa_wm_delete;
-extern Atom		xa_wm_cmapwins;
-extern Cursor		move_curs;
-extern Cursor		resize_curs;
-extern char		*opt_display;
-extern const char *opt_font;
-extern const char *opt_fg;
-extern const char *opt_bg;
-extern int		opt_vd;
-extern int		opt_bw;
-extern XColor		fg, bg, fc;
-extern char		*opt_fc;
-extern int		vdesk;
-
-extern char*		window_manager_name;
-
+extern int vdesk;
 extern char throwUnmaps;
-
-extern int wm_running;
-
 extern Client **prev_focused;
 
 int handle_xerror(Display *dpy, XErrorEvent *e);
 int ignore_xerror(Display *dpy, XErrorEvent *e);
-void dump_clients();
-void handle_signal(int signo);
 
-void warp_pointer(Window w, int x, int y);
+#define LOG(msg, ...) do {				\
+		fprintf(stderr, msg,  ## __VA_ARGS__);  \
+	} while (0)
 
-# define RD_DESK( desk ) ( (desk)->vdesk )
-
-#define LOG(msg, ...) do {                      \
-        fprintf(stderr, msg,  ## __VA_ARGS__);  \
-    } while (0)
-
-void quit_nicely();
+void quit_nicely(void);
 
 #endif // ! EVILWM_H_

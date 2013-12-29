@@ -77,6 +77,10 @@ static void recalculate_sweep(Client *c, int x1, int y1, int x2, int y2)
 	c->y = (y1 <= y2) ? y1 : y1 - c->height;
 }
 
+#define GRAB(w, mask, curs) \
+	(XGrabPointer(dpy, w, False, mask, GrabModeAsync, GrabModeAsync, \
+	None, curs, CurrentTime) == GrabSuccess)
+
 static void sweep(Client *c)
 {
 	XEvent ev;
