@@ -6,11 +6,12 @@
 #include "events.h"
 #include "client.h"
 #include "screen.h"
-#include "newclient.h"
+#include "keys.h"
 
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <unistd.h>
 
 #include <X11/Xatom.h>
 #include <X11/cursorfont.h>

@@ -68,7 +68,7 @@ int keys_run(XKeyEvent* e) {
 }
 
 void keys_run_button(XButtonEvent* be) {
-    int k;
+    int k = 0;
     if (be->button == Button1) k = XK_Pointer_Button1;
     else if (be->button == Button2) k = XK_Pointer_Button2;
     else if (be->button == Button3) k = XK_Pointer_Button3;

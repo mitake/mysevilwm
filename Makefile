@@ -1,4 +1,4 @@
-CFLAGS = -Os
+CFLAGS = -Os -Wall
 LDFLAGS = -L/usr/X11R6/lib -lX11
 OBJS = screen.o keys.o events.o sevilwm.o client.o
 EXES = sevilwm

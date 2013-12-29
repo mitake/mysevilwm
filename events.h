@@ -58,4 +58,8 @@ void  ev_resize_window_x(EvArgs args);
 void  ev_resize_window_y(EvArgs args);
 void  ev_do_nothing(EvArgs args);
 
+#include "client.h"
+
+void set_focus(Client* c);
+
 #endif // ! EVENT_H_

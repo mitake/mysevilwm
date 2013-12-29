@@ -91,4 +91,6 @@ void warp_pointer(Window w, int x, int y);
         fprintf(stderr, msg,  ## __VA_ARGS__);  \
     } while (0)
 
+void quit_nicely();
+
 #endif // ! EVILWM_H_

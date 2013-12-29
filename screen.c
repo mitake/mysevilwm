@@ -8,6 +8,7 @@
 #include <limits.h>
 
 #include "evilwm.h"
+#include "events.h"
 
 int driveEnterNotify;
 

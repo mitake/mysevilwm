@@ -4,14 +4,17 @@
 
 #include "evilwm.h"
 #include "events.h"
-#include "newclient.h"
 #include "screen.h"
+#include "keys.h"
 
 #include <stdlib.h>
 #include <string.h>
 #include <signal.h>
-#include <X11/cursorfont.h>
 #include <stdio.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+
+#include <X11/cursorfont.h>
 #include <X11/Xlib.h>
 #include <X11/Xproto.h>
 
