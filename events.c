@@ -325,8 +325,8 @@ static void spawn(char* cmd[])
 
 void ev_exec_command(EvArgs args)
 {
-	char* a[64];
-	char* tmp = (char*)malloc(strlen(args)+1);
+	char *a[64];
+	char *tmp = (char *)calloc(strlen(args) + 1, sizeof(char));
 	int i = 0;
 
 	strcpy(tmp, args);
