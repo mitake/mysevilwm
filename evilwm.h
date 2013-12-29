@@ -64,4 +64,4 @@ int ignore_xerror(Display *dpy, XErrorEvent *e);
 
 void quit_nicely(void);
 
-#endif // ! EVILWM_H_
+#endif  /* EVILWM_H_ */
