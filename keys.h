@@ -11,8 +11,8 @@ typedef struct {
     EvArgs arg;
 } Key;
 
-void keys_init();
+void keys_init(void);
 int keys_run(XKeyEvent* e);
 void keys_run_button(XButtonEvent* e);
 
-#endif // ! __KEYBOARDWM_KEYS_H__
+#endif /* __KEYBOARDWM_KEYS_H__ */
