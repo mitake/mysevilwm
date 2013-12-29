@@ -125,14 +125,9 @@ void change_gravity(Client *c, int multiplier) {
     c->y += multiplier * dy;
 }
 
-extern Client *cl;
-
 void send_wm_delete(Client *c) {
     int i, n, found = 0;
     Atom *protocols;
-
-    printf("send_wm_delete(): c == %p\n", c);
-    printf("send_wm_delete(): cl == %p\n", cl);
 
     if (c) {
         if (XGetWMProtocols(dpy, c->window, &protocols, &n)) {
@@ -144,7 +139,6 @@ void send_wm_delete(Client *c) {
     }
 
     next(NULL);
-    printf("send_wm_delete(): cl == %p\n", cl);
 }
 
 static int send_xmessage(Window w, Atom a, long x) {

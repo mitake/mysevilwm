@@ -75,12 +75,9 @@ extern int wm_running;
 
 extern Client **prev_focused;
 
-/* void do_event_loop(); */
 int handle_xerror(Display *dpy, XErrorEvent *e);
 int ignore_xerror(Display *dpy, XErrorEvent *e);
 void dump_clients();
-/*void spawn(const char *const cmd[]);*/
-void spawn(char* cmd[]);
 void handle_signal(int signo);
 
 void warp_pointer(Window w, int x, int y);
