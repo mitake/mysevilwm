@@ -34,7 +34,7 @@
 #define ungravitate(c) \
 	change_gravity(c, -1)
 
-extern Display *dp;
+extern Display *dpy;
 extern Client *current;
 extern int screen;
 extern Window root;
