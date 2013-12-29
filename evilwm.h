@@ -67,8 +67,6 @@ extern int		vdesk;
 
 extern char*		window_manager_name;
 
-extern char null_str[];
-
 extern char throwUnmaps;
 
 extern int wm_running;

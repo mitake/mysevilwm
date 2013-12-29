@@ -25,7 +25,6 @@ struct Client {
 };
 
 Client* find_client(Window w);
-int wm_state(Client *c);
 void change_gravity(Client *c, int multiplier);
 void remove_client(Client *c, int from_cleanup);
 void send_config(Client *c);
@@ -34,4 +33,4 @@ void set_wm_state(Client *c, int state);
 
 void make_new_client(Window w);
 
-#endif // ! CLIENT_H_
+#endif /* CLIENT_H_ */
