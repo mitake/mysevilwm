@@ -376,14 +376,13 @@ void switch_vdesk(int v)
 	if (v == vdesk)
 		return;
 
-	if (current != 0) {
+	if (current != NULL) {
 		XSetWindowBackground(dpy, current->parent, bg.pixel);
 		XClearWindow(dpy, current->parent);
 	}
 
 	get_mouse_position(&x, &y);
-
-	current = 0;
+	current = NULL;
 
 	for (c = head_client; c; c = c->next) {
 		if (c->vdesk == vdesk)
