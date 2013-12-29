@@ -95,8 +95,6 @@ int ignore_xerror(Display *d, XErrorEvent *e) {
 }
 
 
-void force_set_focus(void);
-
 void setup_display() {
     XGCValues gv;
     XSetWindowAttributes attr;

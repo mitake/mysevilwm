@@ -21,6 +21,7 @@ void change_vdesk(Client *c, int vd);
 
 void focus(Client* c);
 void set_focus(Client* c);
+void force_set_focus(void);
 
 void change_state(Client* client,
                   int x, int y, int w, int h, int vd, int focused, char mark);
