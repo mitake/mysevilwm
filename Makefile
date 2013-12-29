@@ -1,6 +1,6 @@
 CFLAGS = -Os
 LDFLAGS = -L/usr/X11R6/lib -lX11
-OBJS = newclient.o screen.o keys.o events.o sevilwm.o client.o
+OBJS = screen.o keys.o events.o sevilwm.o client.o
 EXES = sevilwm
 
 all: $(EXES)

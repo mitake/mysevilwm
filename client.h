@@ -32,4 +32,6 @@ void send_config(Client *c);
 void send_wm_delete(Client *c);
 void set_wm_state(Client *c, int state);
 
+void make_new_client(Window w);
+
 #endif // ! CLIENT_H_
